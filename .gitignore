@@ -30,5 +30,17 @@ Thumbs.db
 # Logs
 *.log
 
-# Environment files
+# Environment files (EXCLUDE .env for security)
 .env.local
+.env
+
+# API Keys and sensitive data
+*api_key*
+*key*
+*.pem
+*.key
+
+# Temporary files
+tmp/
+temp/
+*.tmp
