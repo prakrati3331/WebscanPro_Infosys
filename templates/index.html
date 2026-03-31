@@ -903,7 +903,7 @@
                     <label for="url">Target URL</label>
                     <div class="input-wrapper">
                         <i class="fas fa-globe"></i>
-                        <input type="text" id="url" value="http://testphp.vulnweb.com/artists.php?artist=1" required placeholder="Enter target URL...">
+                        <input type="text" id="url" value="http://localhost:45/" required placeholder="Enter target URL...">
                     </div>
                 </div>
                 
@@ -951,6 +951,20 @@
                             <label for="scanQuick">
                                 <i class="fas fa-bolt"></i>
                                 <div>Quick Scan</div>
+                            </label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" id="scanAccess" name="scanType" value="access">
+                            <label for="scanAccess">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>Access Control</div>
+                            </label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" id="scanIDOR" name="scanType" value="idor">
+                            <label for="scanIDOR">
+                                <i class="fas fa-key"></i>
+                                <div>IDOR</div>
                             </label>
                         </div>
                     </div>
@@ -1151,41 +1165,45 @@
 
         function addVulnerability(vuln) {
             console.log('[DEBUG] Adding vulnerability:', vuln);
+            console.log('[DEBUG] Vulnerability type:', typeof vuln);
+            console.log('[DEBUG] Vulnerability payload:', vuln.payload);
             
             const vulnerabilityList = document.getElementById('vulnerabilityList');
             
-            // Handle different data structures
-            let vulnerabilityData = {};
-            
-            if (typeof vuln === 'string') {
-                // Parse HTML string format
-                const div = document.createElement('div');
-                div.innerHTML = vuln;
-                const details = div.querySelectorAll('strong');
-                const codeElement = div.querySelector('code');
-                
-                vulnerabilityData = {
-                    type: details[0] ? details[0].textContent : 'Unknown',
-                    url: details[1] ? details[1].textContent : 'N/A',
-                    description: details[2] ? details[2].textContent : 'No description',
-                    severity: details[3] ? details[3].textContent : 'Medium',
-                    payload: codeElement ? codeElement.textContent : 'N/A'
-                };
-            } else if (typeof vuln === 'object') {
-                // Use object directly
-                vulnerabilityData = {
-                    type: vuln.type || 'Unknown',
-                    url: vuln.url || 'N/A',
-                    description: vuln.description || 'No description',
-                    severity: vuln.severity || 'Medium',
-                    payload: vuln.payload || 'N/A'
-                };
-            } else {
-                console.log('[DEBUG] Unexpected vulnerability data type:', typeof vuln, vuln);
-                return;
-            }
-            
+            // Extract vulnerability data
+                let vulnerabilityData;
+                if (typeof vuln === 'string') {
+                    // Parse HTML string
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(vuln, 'text/html');
+                    const details = doc.querySelectorAll('.vuln-details');
+                    const codeElement = doc.querySelector('.vuln-payload code');
+                    
+                    vulnerabilityData = {
+                        type: details[0] ? details[0].textContent : 'Unknown',
+                        url: details[1] ? details[1].textContent : 'N/A',
+                        description: details[2] ? details[2].textContent : 'No description',
+                        severity: details[3] ? details[3].textContent : 'Medium',
+                        payload: codeElement ? codeElement.textContent : 'N/A'
+                    };
+                } else if (typeof vuln === 'object') {
+                    // Use object directly (JSON response)
+                    vulnerabilityData = {
+                        type: vuln.type || 'Unknown',
+                        url: vuln.url || 'N/A',
+                        description: vuln.description || 'No description',
+                        severity: vuln.severity || 'Medium',
+                        payload: vuln.payload || 'N/A',
+                        parameter: vuln.parameter || 'N/A',
+                        method: vuln.method || 'N/A'
+                    };
+                } else {
+                    console.log('[DEBUG] Unexpected vulnerability data type:', typeof vuln, vuln);
+                    return;
+                }          
             console.log('[DEBUG] Parsed vulnerability data:', vulnerabilityData);
+            console.log('[DEBUG] Parsed payload:', vulnerabilityData.payload);
+            console.log('[DEBUG] Payload type:', typeof vulnerabilityData.payload);
             
             const severityClass = getSeverityClass(vulnerabilityData.severity);
             
@@ -1196,18 +1214,30 @@
                     <div class="vulnerability-type">${vulnerabilityData.type}</div>
                     <div class="severity-badge severity-${severityClass}">${vulnerabilityData.severity}</div>
                 </div>
-                <div class="vulnerability-details">
+                <div class="vulnerability-body">
                     <div class="detail-row">
-                        <div class="detail-label"><i class="fas fa-link"></i> URL:</div>
+                        <div class="detail-label"><i class="fas fa-globe"></i> URL:</div>
                         <div class="detail-value">${vulnerabilityData.url}</div>
                     </div>
+                    ${vulnerabilityData.parameter && vulnerabilityData.parameter !== 'N/A' ? `
                     <div class="detail-row">
-                        <div class="detail-label"><i class="fas fa-exclamation-triangle"></i> Description:</div>
-                        <div class="detail-value">${vulnerabilityData.description}</div>
+                        <div class="detail-label"><i class="fas fa-tag"></i> Parameter:</div>
+                        <div class="detail-value">${vulnerabilityData.parameter}</div>
                     </div>
+                    ` : ''}
+                    ${vulnerabilityData.method && vulnerabilityData.method !== 'N/A' ? `
+                    <div class="detail-row">
+                        <div class="detail-label"><i class="fas fa-exchange-alt"></i> Method:</div>
+                        <div class="detail-value">${vulnerabilityData.method}</div>
+                    </div>
+                    ` : ''}
                     <div class="detail-row">
                         <div class="detail-label"><i class="fas fa-code"></i> Payload:</div>
-                        <div class="detail-value"><span class="payload-code">${vulnerabilityData.payload}</span></div>
+                        <div class="detail-value"><span class="payload-code">${vulnerabilityData.payload ? vulnerabilityData.payload.replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'N/A'}</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label"><i class="fas fa-info-circle"></i> Description:</div>
+                        <div class="detail-value">${vulnerabilityData.description}</div>
                     </div>
                 </div>
             `;
