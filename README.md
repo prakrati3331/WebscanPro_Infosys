@@ -26,14 +26,17 @@ WebScanPro is a powerful and comprehensive web application security scanner desi
 
 
 ### Core Capabilities
-- **Comprehensive Vulnerability Detection**: SQL Injection, XSS, and other OWASP Top 10 vulnerabilities
-- **Intelligent Crawling**: JavaScript-aware crawling with configurable depth
-- **Real-time Scanning**: Live progress updates and status monitoring
-- **Multiple Scan Types**: Quick, Standard, and Comprehensive scan modes
-- **Authentication Testing**: Support for various authentication mechanisms
-- **API Security**: Automated API endpoint testing capabilities
-- **Verbose Payload Testing**: Real-time display of all tested payloads
-- **Session Management**: Automatic re-authentication for protected applications
+- **🔒 Comprehensive Vulnerability Detection**: SQL Injection, XSS, Access Control, IDOR, and other OWASP Top 10 vulnerabilities
+- **🛡️ Access Control Testing**: Broken access control detection, privilege escalation testing, and unauthorized access identification
+- **🎯 IDOR Testing**: Insecure Direct Object Reference detection with parameter tampering and object reference validation
+- **🔍 Intelligent Crawling**: JavaScript-aware crawling with configurable depth and scope
+- **⚡ Real-time Scanning**: Live progress updates and status monitoring with payload visibility
+- **🎛️ Multiple Scan Types**: All Scans, SQLi Only, XSS Only, Access Control Only, IDOR Only, and Quick scan modes
+- **🔐 Authentication Testing**: Support for various authentication mechanisms with credential management
+- **🔌 API Security**: Automated API endpoint testing capabilities
+- **💣 Verbose Payload Testing**: Real-time display of all tested payloads for SQLi, XSS, and IDOR attacks
+- **🔄 Session Management**: Automatic re-authentication for protected applications
+- **📊 Advanced Reporting**: Professional reports with detailed vulnerability information and remediation guidance
 
 ### Web Interface Features
 - **Modern Web Interface**: Professional, responsive design with glassmorphism effects
@@ -146,6 +149,12 @@ python main.py -u https://example.com --scan-type sqli
 
 # XSS only scan
 python main.py -u https://example.com --scan-type xss
+
+# Access Control only scan
+python main.py -u https://example.com --scan-type access
+
+# IDOR only scan
+python main.py -u https://example.com --scan-type idor
 
 # Quick scan (fast, limited scope)
 python main.py -u https://example.com --scan-type quick
@@ -263,7 +272,9 @@ WebScanPro/
 │   └── scan_controller.py # Scan orchestration
 ├── modules/             # Security testing modules
 │   ├── sql_injection.py  # SQL Injection detection with payloads
-│   └── xss_scanner.py   # XSS detection
+│   ├── xss_scanner.py   # XSS detection
+│   ├── access_control_test.py  # Access Control vulnerability testing
+│   └── idor_test.py     # IDOR vulnerability testing
 ├── templates/           # Web interface templates
 │   └── index.html      # Main web interface
 ├── reports/             # Generated scan reports
@@ -304,7 +315,23 @@ WebScanPro/
 - **DOM-based XSS**: Tests for client-side XSS
 - **Context Analysis**: Analyzes injection contexts
 - **Payload Variations**: Multiple encoding and bypass techniques
+- **Real-time Payload Display**: Shows successful XSS payloads in results
 
+### Access Control Scanner
+- **Missing Function Level Access Control**: Detects unprotected endpoints
+- **Privilege Escalation**: Tests for unauthorized privilege access
+- **Authentication Bypass**: Identifies pages accessible without proper auth
+- **Role-based Testing**: Validates role-based access controls
+- **Endpoint Analysis**: Tests sensitive URLs and API endpoints
+- **Meaningful Payloads**: Shows "Unauthenticated access to /admin" style payloads
+
+### IDOR Scanner
+- **Parameter Tampering**: Tests ID parameter manipulation
+- **Object Reference Validation**: Detects insecure object references
+- **User ID Testing**: Tests user_id, account_id, order_id parameters
+- **JSON Payload Testing**: Tests JSON-based IDOR vulnerabilities
+- **Horizontal Access Control**: Detects cross-user data access
+- **Payload Display**: Shows "user_id=124" style test payloads
 
 ## 📊 Report Features
 
@@ -462,4 +489,29 @@ For support and questions:
 
 ---
 
-**⚡ Pro Tip**: For reliable vulnerability testing, use public test sites like `http://testphp.vulnweb.com/artists.php?artist=1` for consistent results, and DVWA only when you need to test authenticated scanning capabilities.
+## 🎉 Latest Features & Updates
+
+### ✅ New Security Modules Added
+- **🛡️ Access Control Scanner**: Comprehensive access control vulnerability testing
+- **🎯 IDOR Scanner**: Advanced Insecure Direct Object Reference detection
+- **💣 Enhanced Payload Display**: All vulnerability types now show detailed payloads
+
+### 🚀 Enhanced Web Interface
+- **📊 Real-time Payload Visibility**: See exactly what payloads are being tested
+- **🎛️ Extended Scan Types**: Access Control Only, IDOR Only, and All Scans options
+- **📱 Improved Vulnerability Cards**: Detailed payload information for all vulnerability types
+- **🔍 Better Debugging**: Enhanced logging and vulnerability tracking
+
+### 📈 What's Working Now
+- ✅ **SQL Injection**: Full payload testing with real-time display
+- ✅ **XSS**: Complete payload visibility with proper HTML escaping
+- ✅ **Access Control**: Meaningful payload descriptions and endpoint testing
+- ✅ **IDOR**: Parameter=value payload display and object reference testing
+- ✅ **All Scans**: Comprehensive vulnerability detection with detailed reporting
+
+### 🎯 Key Improvements
+- **Payload Visibility**: All scanners now display successful payloads
+- **Web Interface**: Modern, responsive design with real-time updates
+- **Scan Types**: Flexible scanning options for focused or comprehensive testing
+- **Documentation**: Complete updated documentation for all features
+

@@ -13,16 +13,20 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# Force template reloading
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.jinja_env.auto_reload = True
+
 # Global variables for process management
 process_queue = Queue()
 stop_event = threading.Event()
 
-# HTML template for the web interface
+# HTML template for the web interface - UPDATED WITH ACCESS CONTROL
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebScanPro</title>
+    <title>WebScanPro - Updated April 2026</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,6 +55,23 @@ HTML_TEMPLATE = """
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
+        }
+        input[type="radio"] {
+            margin-right: 8px;
+            margin-bottom: 5px;
+        }
+        label {
+            display: inline-block;
+            margin-right: 15px;
+            font-weight: normal;
+            margin-bottom: 5px;
+        }
+        .scan-options {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
         }
         button {
             background-color: #4CAF50;
@@ -143,6 +164,12 @@ HTML_TEMPLATE = """
                 <label for="scanXSS">XSS Only</label>
                 <input type="radio" id="scanSQL" name="scanType" value="sqli">
                 <label for="scanSQL">SQLi Only</label>
+                <input type="radio" id="scanQuick" name="scanType" value="quick">
+                <label for="scanQuick">Quick</label>
+                <input type="radio" id="scanAccess" name="scanType" value="access">
+                <label for="scanAccess">Access Control</label>
+                <input type="radio" id="scanIDOR" name="scanType" value="idor">
+                <label for="scanIDOR">IDOR</label>
             </div>
             <button type="submit" id="scanButton">Start Scan</button>
             <button type="button" id="cancelBtn" style="display: none;">Cancel Scan</button>
@@ -383,7 +410,7 @@ def scan():
         ]
         
         # Add scan type if specified
-        if scan_type in ['xss', 'sqli']:
+        if scan_type in ['xss', 'sqli', 'access', 'idor']:
             cmd.extend(['--scan-type', scan_type])
         elif scan_type == 'quick':
             # Quick scan mode - only SQLi with limited scope
@@ -637,5 +664,8 @@ if __name__ == '__main__':
     import atexit
     atexit.register(cleanup_processes)
     
+    # Get port from environment (for Render) or default to 5000
+    port = int(os.environ.get('PORT', 5000))
+    
     # Run the app with multithreading enabled
-    app.run(debug=True, port=5000, threaded=True)
+    app.run(debug=True, host='0.0.0.0', port=port, threaded=True)

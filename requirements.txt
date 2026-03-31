@@ -6,6 +6,7 @@ lxml>=4.9.1
 
 # Web Application Framework
 flask>=2.2.2
+flask-cors>=4.0.0
 
 # Data Processing
 pandas>=1.5.2
