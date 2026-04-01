@@ -515,3 +515,9 @@ For support and questions:
 - **Scan Types**: Flexible scanning options for focused or comprehensive testing
 - **Documentation**: Complete updated documentation for all features
 
+## 👨‍💻 Author
+
+**Prakrati Mishra**
+- GitHub:[https://github.com/prakrati3331]
+- LinkedIn:[https://www.linkedin.com/in/prakrati-mishra-19122b291/]
+
